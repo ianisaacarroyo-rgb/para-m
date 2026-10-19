@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="RE: STEP transforma la presión de las pisadas en pequeños impulsos de energía eléctrica con discos piezoeléctricos.">
+<meta name="theme-color" content="#102a43">
+<title>RE: STEP — Energía en cada paso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--font:'Space Grotesk','Segoe UI',system-ui,sans-serif;--ease:cubic-bezier(.22,.7,.2,1);--fill:#ff8a3d;--on-fill:#102a43}
+body{--bg:#102a43;--ink:#f4ebe0;--mute:#bccad7;--line:rgba(244,235,224,.2);--ac:#ff8a3d;--disc:#1f4468}
+body[data-tone="light"]{--bg:#f4ebe0;--ink:#102a43;--mute:#43586c;--line:rgba(16,42,67,.2);--ac:#b8410d;--disc:#e3d4c2}
+*{box-sizing:border-box;margin:0;transition:background-color .6s var(--ease),color .6s var(--ease),border-color .6s var(--ease)}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font:400 1.06rem/1.7 var(--font);display:grid;grid-template-rows:auto 1fr auto;height:100svh;overflow:hidden}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+:focus-visible{outline:3px solid var(--fill);outline-offset:3px}
+.wrap{width:min(1000px,90%);margin-inline:auto}
+h1,h2,h3{font-weight:500;line-height:1.12;letter-spacing:-.02em}
+h2{font-size:clamp(1.8rem,4vw,2.7rem);margin-bottom:1.2rem;max-width:18ch}
+p{color:var(--mute);max-width:60ch}
+p+p{margin-top:1rem}
+.label{color:var(--ac);font-size:.9rem;font-weight:500;margin-bottom:1rem}
+ 
+header{border-bottom:1px solid var(--line)}
+header .wrap{display:flex;justify-content:space-between;align-items:center;gap:1rem;min-height:64px;flex-wrap:wrap;padding:.5rem 0}
+.logo{font-weight:700;font-size:1.05rem}
+.menu{display:flex;gap:.2rem;flex-wrap:wrap;position:relative}
+.menu button{position:relative;z-index:1;padding:.5rem 1rem;border-radius:999px;color:var(--mute);font-size:.95rem}
+.menu button:hover{color:var(--ink)}
+.menu button[aria-current="page"]{color:var(--on-fill);font-weight:500}
+.pill{position:absolute;left:0;top:0;border-radius:999px;background:var(--fill);transition:transform .5s var(--ease),width .5s var(--ease),height .5s var(--ease);will-change:transform}
+ 
+main{overflow-y:auto}
+.panel{min-height:100%;display:flex;align-items:center;padding:clamp(24px,5vh,56px) 0}
+.panel[hidden]{display:none}
+.panel:not([hidden]) .rv{animation:up .7s var(--ease) both;animation-delay:calc(var(--i,0)*70ms)}
+@keyframes up{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+ 
+.hero h1{font-size:clamp(2.6rem,8vw,5.4rem);font-weight:700;margin-bottom:1.4rem}
+.hero h1 em{font-style:normal;color:var(--ac)}
+.hero p{font-size:1.15rem;color:var(--ink)}
+.btn{display:inline-block;margin-top:1.8rem;padding:.9rem 1.6rem;background:var(--fill);color:var(--on-fill);border-radius:999px;font-weight:700;transition:transform .35s var(--ease),box-shadow .35s var(--ease)}
+.btn:hover{transform:translateY(-2px);box-shadow:0 6px 0 rgba(0,0,0,.18)}
+.nextrow{margin-top:1.8rem}
+.nextrow .btn{margin:0;background:none;color:var(--ink);border:2px solid var(--fill);padding:.65rem 1.3rem;font-weight:500}
+.nextrow .btn:hover{background:var(--fill);color:var(--on-fill);box-shadow:none}
+ 
+.two{display:grid;grid-template-columns:1fr 1.2fr;gap:clamp(24px,6vw,72px);align-items:center}
+@media(max-width:800px){.two{grid-template-columns:1fr}}
+ 
+/* flujo */
+.flow{display:flex;align-items:stretch;gap:.6rem;margin-top:2rem;flex-wrap:wrap}
+.step{flex:1 1 170px;border:2px solid var(--line);border-radius:14px;padding:1rem 1.1rem;display:grid;grid-template-columns:44px 1fr;gap:.8rem;align-items:center}
+.step svg{width:44px;height:44px;stroke:var(--ac);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.step b{display:block;font-weight:500;line-height:1.25}
+.step span{font-size:.85rem;color:var(--mute);line-height:1.35;display:block;margin-top:.15rem}
+.arrow{align-self:center;color:var(--ac);font-weight:700}
+@media(max-width:700px){.arrow{display:none}}
+ 
+/* prototipo */
+.photo{width:100%;border-radius:16px;display:none;aspect-ratio:4/3;object-fit:cover;border:2px solid var(--line)}
+.pad-scene{display:grid;grid-template-columns:minmax(0,1fr) 48px 44px;align-items:center;width:min(372px,100%)}
+.pad{grid-column:1;display:grid;grid-template-columns:repeat(3,1fr);gap:12px;padding:20px;border:2px solid var(--line);border-radius:16px;width:100%;aspect-ratio:1}
+.disc{border-radius:50%;background:var(--disc);transition:background-color .7s var(--ease),transform .25s var(--ease)}
+.disc.on{background:var(--fill);transform:scale(.93);transition:background-color .08s,transform .12s}
+.electric-wire{grid-column:2;position:relative;height:4px;border:1px solid #83969c;border-radius:4px;background:#253e49}
+.electric-pulse{position:absolute;top:-4px;left:0;width:10px;height:10px;border-radius:50%;background:var(--fill);opacity:0;box-shadow:0 0 8px var(--fill),0 0 16px var(--fill)}
+.pad-scene.is-active .electric-pulse{animation:current-travel .46s ease-out}
+.led-unit{grid-column:3;display:grid;width:44px;height:44px;place-items:center;border:2px solid #83969c;border-radius:50%;background:#1d3540}
+.led-bulb{width:18px;aspect-ratio:1;border:2px solid #b35b53;border-radius:50%;background:#593c42;box-shadow:inset 0 0 5px rgba(0,0,0,.55)}
+.pad-scene.is-active .led-bulb{animation:led-on .46s ease-out}
+@keyframes current-travel{0%{left:0;opacity:0}12%{opacity:1}82%{opacity:1}100%{left:calc(100% - 10px);opacity:0}}
+@keyframes led-on{0%,100%{background:#593c42;box-shadow:inset 0 0 5px rgba(0,0,0,.55)}18%,72%{background:var(--fill);box-shadow:0 0 10px var(--fill),0 0 28px var(--fill)}}
+.cap{font-size:.85rem;color:var(--mute);margin-top:.8rem}
+.facts{list-style:none;padding:0;margin-top:1.2rem;display:grid;gap:.8rem}
+.facts li{padding-left:1.1rem;border-left:3px solid var(--fill);color:var(--mute)}
+.facts b{color:var(--ink);font-weight:700}
+.stat{margin-top:1.4rem;display:flex;align-items:baseline;gap:.9rem;flex-wrap:wrap}
+.stat b{font-size:clamp(2rem,5vw,3rem);font-weight:700;color:var(--ac);line-height:1}
+.stat span{color:var(--mute);max-width:26ch;line-height:1.35}
+ 
+.goals{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(18px,4vw,44px);margin-top:1.8rem}
+@media(max-width:800px){.goals{grid-template-columns:1fr}}
+.goals>div{transition:transform .5s var(--ease)}
+.goals>div:hover{transform:translateY(-4px)}
+.goals h3{font-size:1.4rem;margin-bottom:.5rem;color:var(--ac)}
+ 
+.places{margin-top:1.6rem;display:grid;grid-template-columns:1fr 1fr;gap:0 clamp(24px,5vw,64px)}
+@media(max-width:700px){.places{grid-template-columns:1fr}}
+.places>div{padding:1rem 0;border-top:1px solid var(--line);position:relative}
+.places>div::before{content:"";position:absolute;left:0;top:-1px;height:3px;width:0;background:var(--fill);transition:width .6s var(--ease)}
+.places>div:hover::before{width:100%}
+.places h3{font-size:1.15rem;margin-bottom:.3rem}
+ 
+footer{border-top:1px solid var(--line);padding:14px 0;color:var(--mute);font-size:.85rem}
+footer .wrap{display:flex;justify-content:space-between;gap:.8rem;flex-wrap:wrap}
+@media(prefers-reduced-motion:reduce){*,*::before{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+ 
+<header>
+ <div class="wrap">
+  <button class="logo" data-go="inicio" aria-label="RE: STEP, ir al inicio">RE: STEP</button>
+  <nav class="menu" aria-label="Menú principal">
+   <span class="pill" aria-hidden="true"></span>
+   <button data-go="inicio">Inicio</button>
+   <button data-go="proyecto">El proyecto</button>
+   <button data-go="prototipo">Prototipo 30 × 30</button>
+   <button data-go="objetivos">Objetivos</button>
+   <button data-go="lugares">Aplicaciones</button>
+  </nav>
+ </div>
+</header>
+ 
+<main id="main">
+ 
+ <section class="panel hero" id="inicio">
+  <div class="wrap">
+   <p class="label">Energía que ya está en movimiento</p>
+   <h1>Cada paso<br><em>deja energía.</em></h1>
+   <p>¿Y si cada paso que damos pudiera convertirse en energía? Con RE: STEP, la presión de caminar se transforma en una nueva posibilidad.</p>
+   <button class="btn" data-go="proyecto">Conoce el proyecto</button>
+  </div>
+ </section>
+ 
+ <section class="panel" id="proyecto" hidden>
+  <div class="wrap">
+   <div class="two" style="align-items:start">
+    <div>
+     <p class="label">Introducción</p>
+     <h2>El movimiento también puede generar.</h2>
+    </div>
+    <div>
+     <p><b style="color:var(--ink);font-weight:700">RE: STEP</b> demuestra cómo la presión de las pisadas puede transformarse en energía eléctrica con un sistema de discos piezoeléctricos. Nuestro prototipo de 30 × 30 cm usa la fuerza de caminar para generar pequeños impulsos de electricidad.</p>
+     <p>Una pisada genera poca energía, pero en lugares donde pasan muchas personas las pisadas se suman. Queremos mostrar que algo tan sencillo como caminar puede ayudarnos a imaginar espacios más innovadores y sostenibles.</p>
+    </div>
+   </div>
+   <div class="flow" aria-label="Cómo funciona">
+    <div class="step">
+     <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M24 6v18M16 17l8 8 8-8"/><path d="M8 34h32M12 40h24"/></svg>
+     <div><b>Pisada</b><span>Presión sobre la superficie</span></div>
+    </div>
+    <span class="arrow" aria-hidden="true">→</span>
+    <div class="step">
+     <svg viewBox="0 0 48 48" aria-hidden="true"><ellipse cx="24" cy="24" rx="16" ry="6"/><path d="M8 24v4c0 3.3 7.2 6 16 6s16-2.7 16-6v-4"/></svg>
+     <div><b>El disco se deforma</b><span>Disco piezoeléctrico</span></div>
+    </div>
+    <span class="arrow" aria-hidden="true">→</span>
+    <div class="step">
+     <svg viewBox="0 0 48 48" aria-hidden="true"><path d="M27 5 11 27h12l-2 16 16-22H25z"/></svg>
+     <div><b>Impulso eléctrico</b><span>Pequeña energía generada</span></div>
+    </div>
+   </div>
+  </div>
+ </section>
+ 
+ <section class="panel" id="prototipo" hidden>
+  <div class="wrap two">
+   <div>
+    <img class="photo" id="foto" src="prototipo.jpg" alt="Prototipo RE: STEP de 30 × 30 cm">
+    <div id="padbox">
+        <div class="pad-scene">
+         <div class="pad" id="pad" role="group" aria-label="Esquema del prototipo: nueve discos piezoeléctricos"></div>
+         <span class="electric-wire" aria-hidden="true"><span class="electric-pulse"></span></span>
+         <span class="led-unit" aria-hidden="true"><span class="led-bulb"></span></span>
+        </div>
+     <p class="cap">Esquema ilustrativo. Toca un disco.</p>
+    </div>
+   </div>
+   <div>
+    <p class="label">El prototipo</p>
+    <h2>La pisada activa el sistema.</h2>
+    <p>Una superficie experimental convierte la presión al caminar en impulsos eléctricos mediante discos piezoeléctricos.</p>
+    <ul class="facts">
+     <li><b>30 × 30 cm.</b> Dimensiones del prototipo.</li>
+     <li>La presión de la pisada deforma los discos.</li>
+     <li>El sistema genera pequeños impulsos de energía.</li>
+    </ul>
+    <div class="stat" id="stat" hidden><b id="statV"></b><span id="statT"></span></div>
+   </div>
+  </div>
+ </section>
+ 
+ <section class="panel" id="objetivos" hidden>
+  <div class="wrap">
+   <p class="label">Objetivos</p>
+   <h2>Del paso a la posibilidad.</h2>
+   <p>El proyecto explora una idea pequeña con potencial para inspirar soluciones sostenibles a escala cotidiana.</p>
+   <div class="goals">
+    <div><h3>Demostrar</h3><p>Mostrar cómo la presión de una pisada puede convertirse en energía eléctrica.</p></div>
+    <div><h3>Aprovechar</h3><p>Dar valor a la energía del movimiento que producimos a diario sin notarlo.</p></div>
+    <div><h3>Inspirar</h3><p>Imaginar espacios innovadores y sostenibles aprovechando el paso constante de personas.</p></div>
+   </div>
+  </div>
+ </section>
+ 
+ <section class="panel" id="lugares" hidden>
+  <div class="wrap">
+   <p class="label">Lugares de uso</p>
+   <h2>Donde cada paso cuenta.</h2>
+   <p>Como propuesta de aplicación, la tecnología podría explorarse en espacios con circulación continua de personas.</p>
+   <div class="places">
+    <div><h3>Estaciones y pasillos</h3><p>Zonas de tránsito donde muchas pisadas se repiten durante el día.</p></div>
+    <div><h3>Escuelas y universidades</h3><p>Entradas y corredores como espacios de aprendizaje y experimentación.</p></div>
+    <div><h3>Centros comerciales</h3><p>Áreas concurridas donde el flujo de visitantes es constante.</p></div>
+    <div><h3>Eventos y espacios públicos</h3><p>Lugares temporales para mostrar cómo el movimiento puede generar energía.</p></div>
+   </div>
+  </div>
+ </section>
+ 
+</main>
+ 
+<footer>
+ <div class="wrap"><span id="equipo">RE: STEP</span><span>Una idea en movimiento</span></div>
+</footer>
+ 
+<script>
+/* ===== EDITA AQUÍ ===== */
+var CONFIG={
+ dato:{valor:'',texto:''},   // Ej: valor:'2.4 V', texto:'por pisada en el prototipo'. Si lo dejas vacío, no se muestra.
+ equipo:''                   // Ej: 'Proyecto de Ana, Luis y Mario'. Si lo dejas vacío, se muestra solo RE: STEP.
+};
+/* Foto: guarda una imagen llamada prototipo.jpg en la misma carpeta que index.html y aparecerá sola. */
+/* ======================= */
+ 
+var ORDER=[['inicio','Inicio'],['proyecto','El proyecto'],['prototipo','Prototipo'],['objetivos','Objetivos'],['lugares','Aplicaciones']];
+var TONES={inicio:'dark',proyecto:'light',prototipo:'dark',objetivos:'light',lugares:'dark'};
+var panels=document.querySelectorAll('.panel'),tabs=document.querySelectorAll('.menu button'),main=document.getElementById('main'),pill=document.querySelector('.pill');
+ 
+/* botón "Siguiente" al final de cada sección */
+ORDER.forEach(function(o,i){
+ if(i===0)return;
+ var last=(i===ORDER.length-1),t=last?['inicio','Volver al inicio']:ORDER[i+1];
+ var row=document.createElement('div');row.className='nextrow';
+ row.innerHTML='<button class="btn" data-go="'+t[0]+'">'+(last?t[1]:'Siguiente: '+t[1])+' →</button>';
+ document.querySelector('#'+o[0]+' .wrap').appendChild(row);
+});
+ 
+function movePill(){
+ var a=document.querySelector('.menu button[aria-current="page"]');
+ if(!a)return;
+ pill.style.width=a.offsetWidth+'px';pill.style.height=a.offsetHeight+'px';
+ pill.style.transform='translate('+a.offsetLeft+'px,'+a.offsetTop+'px)';
+}
+function show(id,push){
+ if(!document.getElementById(id))id='inicio';
+ panels.forEach(function(p){p.hidden=(p.id!==id)});
+ tabs.forEach(function(t){if(t.dataset.go===id)t.setAttribute('aria-current','page');else t.removeAttribute('aria-current')});
+ var n=0;document.querySelectorAll('#'+id+' .label,#'+id+' h1,#'+id+' h2,#'+id+' p,#'+id+' .btn,#'+id+' .pad,#'+id+' .photo,#'+id+' .step,#'+id+' .facts li,#'+id+' .stat,#'+id+' .goals>div,#'+id+' .places>div').forEach(function(e){e.classList.add('rv');e.style.setProperty('--i',n++)});
+ document.body.dataset.tone=TONES[id]||'dark';
+ main.scrollTop=0;movePill();
+ if(push&&location.hash!=='#'+id)history.pushState(null,'','#'+id);
+}
+document.addEventListener('click',function(e){var b=e.target.closest('[data-go]');if(b)show(b.dataset.go,true)});
+addEventListener('popstate',function(){show(location.hash.slice(1),false)});
+addEventListener('resize',movePill);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(movePill);
+ 
+/* dato y equipo opcionales */
+if(CONFIG.dato.valor){document.getElementById('statV').textContent=CONFIG.dato.valor;document.getElementById('statT').textContent=CONFIG.dato.texto;document.getElementById('stat').hidden=false}
+if(CONFIG.equipo)document.getElementById('equipo').textContent=CONFIG.equipo;
+ 
+/* foto real: si existe prototipo.jpg reemplaza al esquema */
+var foto=document.getElementById('foto');
+foto.addEventListener('load',function(){foto.style.display='block';document.getElementById('padbox').style.display='none'});
+ 
+/* esquema de discos */
+var pad=document.getElementById('pad');
+var padScene=document.querySelector('.pad-scene');
+var circuitTimer;
+for(var i=0;i<9;i++){
+ var d=document.createElement('button');
+ d.className='disc';d.setAttribute('aria-label','Disco '+(i+1));
+ d.addEventListener('click',function(){var el=this;el.classList.add('on');setTimeout(function(){el.classList.remove('on')},140);padScene.classList.remove('is-active');requestAnimationFrame(function(){padScene.classList.add('is-active')});clearTimeout(circuitTimer);circuitTimer=setTimeout(function(){padScene.classList.remove('is-active')},500)});
+ pad.appendChild(d);
+}
+show(location.hash.slice(1)||'inicio',false);
+</script>
+</body>
+</html>
